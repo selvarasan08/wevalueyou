@@ -28,7 +28,6 @@ import {
   Close,
   CheckCircle,
   Warning,
-  Build,
   LocationOn,
   Description,
   PriorityHigh,
@@ -38,14 +37,16 @@ import {
   CameraAlt,
 } from '@mui/icons-material';
 import watermark from './waterMark-removebg-preview.png';
-import logo from './logo.png';
+import logo from './waterMark-removebg-preview.png';
 import emailjs from '@emailjs/browser';
 
 export default function FacilityIssuesReport() {
   const [formData, setFormData] = useState({
     dateTime: new Date().toISOString().slice(0, 16),
     locationDepartment: '',
+    otherLocation: '',
     issueType: '',
+    otherIssue: '',
     description: '',
     urgency: '',
     contactName: '',
@@ -56,7 +57,6 @@ export default function FacilityIssuesReport() {
   const [imagePreview, setImagePreview] = useState(null);
   const [loading, setLoading] = useState(false);
   const [successDialogOpen, setSuccessDialogOpen] = useState(false);
-
   const [submitStatus, setSubmitStatus] = useState(null);
   const fileInputRef = useRef(null);
 
@@ -64,6 +64,14 @@ export default function FacilityIssuesReport() {
   const EMAILJS_SERVICE_ID = 'service_7wjoe3t';
   const EMAILJS_TEMPLATE_ID = 'template_2zf30dq';
   const EMAILJS_PUBLIC_KEY = 'jleqZ6bYmgFzO3XcC';
+
+  const locations = [
+    'Sunray HQ',
+    'Bukit Batok',
+    'Kallang Bahru',
+    'Sunray Hub',
+    'Others'
+  ];
 
   const issueTypes = [
     'Plumbing',
@@ -92,6 +100,8 @@ export default function FacilityIssuesReport() {
       [name]: value,
     }));
   };
+
+  // ... (keep all existing compressImage, handleImageUpload, removeImage functions unchanged)
 
   const compressImage = (base64Image) => {
     return new Promise((resolve) => {
@@ -184,11 +194,19 @@ export default function FacilityIssuesReport() {
   };
 
   const validateForm = () => {
-    const required = ['locationDepartment', 'issueType', 'description', 'urgency', 'contactName', 'contactEmail'];
+    const required = ['description', 'urgency'];
     for (let field of required) {
       if (!formData[field]) {
         return false;
       }
+    }
+    // Location is required but can be "Others" with otherLocation
+    if (!formData.locationDepartment) {
+      return false;
+    }
+    // Issue type is required but can be "Other" with otherIssue
+    if (!formData.issueType) {
+      return false;
     }
     return true;
   };
@@ -199,7 +217,7 @@ export default function FacilityIssuesReport() {
     if (!validateForm()) {
       setSubmitStatus({
         type: 'error',
-        message: 'Please fill in all required fields',
+        message: 'Please fill in all required fields (Description, Urgency, Location, Issue Type)',
       });
       return;
     }
@@ -207,18 +225,15 @@ export default function FacilityIssuesReport() {
     setLoading(true);
     setSubmitStatus(null);
 
-
-
-
     try {
       const templateParams = {
         report_date: new Date(formData.dateTime).toLocaleString(),
-        location_department: formData.locationDepartment,
-        issue_type: formData.issueType,
+        location_department: formData.locationDepartment === 'Others' ? formData.otherLocation : formData.locationDepartment,
+        issue_type: formData.issueType === 'Other' ? formData.otherIssue : formData.issueType,
         description: formData.description,
         urgency: formData.urgency,
-        contact_name: formData.contactName,
-        contact_email: formData.contactEmail,
+        contact_name: formData.contactName || 'N/A',
+        contact_email: formData.contactEmail || 'N/A',
         contact_phone: formData.contactPhone || 'N/A',
         photo_data: imagePreview || '',
       };
@@ -251,29 +266,15 @@ export default function FacilityIssuesReport() {
           type: 'success',
           message: 'Report submitted successfully! The facilities team has been notified.',
         });
+        setSuccessDialogOpen(true);
 
-        if (response.status === 200) {
-          setSuccessDialogOpen(true);
-
-          setTimeout(() => {
-            setFormData({
-              dateTime: new Date().toISOString().slice(0, 16),
-              locationDepartment: '',
-              issueType: '',
-              description: '',
-              urgency: '',
-              contactName: '',
-              contactEmail: '',
-              contactPhone: '',
-            });
-            removeImage();
-          }, 500);
-        }
         setTimeout(() => {
           setFormData({
             dateTime: new Date().toISOString().slice(0, 16),
             locationDepartment: '',
+            otherLocation: '',
             issueType: '',
+            otherIssue: '',
             description: '',
             urgency: '',
             contactName: '',
@@ -281,6 +282,7 @@ export default function FacilityIssuesReport() {
             contactPhone: '',
           });
           removeImage();
+          setSuccessDialogOpen(false);
           setSubmitStatus(null);
         }, 3000);
       }
@@ -331,242 +333,59 @@ export default function FacilityIssuesReport() {
       position: 'relative',
       overflow: 'hidden'
     }}>
-      {/* EXPANDED Multiple Diagonal Watermarks - 15 watermarks total */}
-      <Box sx={{
-        position: 'fixed',
-        inset: 0,
-        zIndex: 0,
-        pointerEvents: 'none',
-        overflow: 'hidden'
-      }}>
-        {/* Top Left Corner */}
-        <Box sx={{
-          position: 'absolute',
-          top: '-80px',
-          left: '-80px',
-          width: '350px',
-          height: '350px',
-          transform: 'rotate(-45deg)',
-          opacity: 0.05,
-          backgroundImage: `url(${watermark})`,
-          backgroundSize: 'contain',
-          backgroundRepeat: 'no-repeat',
-          backgroundPosition: 'center'
-        }} />
+      {/* ... (keep all watermark styling unchanged) */}
 
-        {/* Top Center Left */}
-        <Box sx={{
-          position: 'absolute',
-          top: '50px',
-          left: '20%',
-          width: '280px',
-          height: '280px',
-          transform: 'rotate(-38deg)',
-          opacity: 0.04,
-          backgroundImage: `url(${watermark})`,
-          backgroundSize: 'contain',
-          backgroundRepeat: 'no-repeat',
-          backgroundPosition: 'center'
-        }} />
+<Box
+  sx={{
+    position: 'fixed',
+    inset: 0,
+    zIndex: 0,
+    pointerEvents: 'none',
+    overflow: 'hidden',
+  }}
+>
+  {Array.from({ length: 14 }).map((_, row) =>
+    Array.from({ length: 14 }).map((_, col) => {
+      const size = 260;
+      const gap = 230;
+      const rotation = -45;
 
-        {/* Top Center */}
-        <Box sx={{
-          position: 'absolute',
-          top: '100px',
-          left: '45%',
-          width: '300px',
-          height: '300px',
-          transform: 'rotate(-30deg)',
-          opacity: 0.04,
-          backgroundImage: `url(${watermark})`,
-          backgroundSize: 'contain',
-          backgroundRepeat: 'no-repeat',
-          backgroundPosition: 'center'
-        }} />
+      // 🚀 EXTENDED GRID ORIGIN (KEY FIX)
+      const r = row - 6;
+      const c = col - 6;
 
-        {/* Top Right */}
-        <Box sx={{
-          position: 'absolute',
-          top: '-100px',
-          right: '-100px',
-          width: '400px',
-          height: '400px',
-          transform: 'rotate(-45deg)',
-          opacity: 0.06,
-          backgroundImage: `url(${watermark})`,
-          backgroundSize: 'contain',
-          backgroundRepeat: 'no-repeat',
-          backgroundPosition: 'center'
-        }} />
+      return (
+        <Box
+          key={`${row}-${col}`}
+          sx={{
+            position: 'absolute',
 
-        {/* Top Right Inner */}
-        <Box sx={{
-          position: 'absolute',
-          top: '120px',
-          right: '15%',
-          width: '290px',
-          height: '290px',
-          transform: 'rotate(-42deg)',
-          opacity: 0.04,
-          backgroundImage: `url(${watermark})`,
-          backgroundSize: 'contain',
-          backgroundRepeat: 'no-repeat',
-          backgroundPosition: 'center'
-        }} />
+            // 🔥 DIAGONAL-SAFE POSITIONING
+            left: `${c * gap - r * gap}px`,
+            top: `${r * gap}px`,
 
-        {/* Middle Left Top */}
-        <Box sx={{
-          position: 'absolute',
-          top: '30%',
-          left: '-120px',
-          width: '380px',
-          height: '380px',
-          transform: 'rotate(-50deg)',
-          opacity: 0.05,
-          backgroundImage: `url(${watermark})`,
-          backgroundSize: 'contain',
-          backgroundRepeat: 'no-repeat',
-          backgroundPosition: 'center'
-        }} />
+            width: size,
+            height: size,
+            transform: `rotate(${rotation}deg)`,
+            opacity: 0.09,
 
-        {/* Middle Left Center */}
-        <Box sx={{
-          position: 'absolute',
-          top: '45%',
-          left: '10%',
-          width: '260px',
-          height: '260px',
-          transform: 'rotate(-48deg)',
-          opacity: 0.035,
-          backgroundImage: `url(${watermark})`,
-          backgroundSize: 'contain',
-          backgroundRepeat: 'no-repeat',
-          backgroundPosition: 'center'
-        }} />
+            backgroundImage: `url(${watermark})`,
+            backgroundRepeat: 'no-repeat',
+            backgroundSize: 'contain',
+            backgroundPosition: 'center',
+          }}
+        />
+      );
+    })
+  )}
+</Box>
 
-        {/* Center Large Watermark */}
-        <Box sx={{
-          position: 'absolute',
-          top: '50%',
-          left: '50%',
-          width: '500px',
-          height: '500px',
-          transform: 'translate(-50%, -50%) rotate(-45deg)',
-          opacity: 0.03,
-          backgroundImage: `url(${watermark})`,
-          backgroundSize: 'contain',
-          backgroundRepeat: 'no-repeat',
-          backgroundPosition: 'center'
-        }} />
 
-        {/* Middle Right Top */}
-        <Box sx={{
-          position: 'absolute',
-          top: '35%',
-          right: '-90px',
-          width: '360px',
-          height: '360px',
-          transform: 'rotate(-40deg)',
-          opacity: 0.05,
-          backgroundImage: `url(${watermark})`,
-          backgroundSize: 'contain',
-          backgroundRepeat: 'no-repeat',
-          backgroundPosition: 'center'
-        }} />
 
-        {/* Middle Right Center */}
-        <Box sx={{
-          position: 'absolute',
-          top: '55%',
-          right: '12%',
-          width: '310px',
-          height: '310px',
-          transform: 'rotate(-52deg)',
-          opacity: 0.045,
-          backgroundImage: `url(${watermark})`,
-          backgroundSize: 'contain',
-          backgroundRepeat: 'no-repeat',
-          backgroundPosition: 'center'
-        }} />
 
-        {/* Bottom Left Top */}
-        <Box sx={{
-          position: 'absolute',
-          bottom: '250px',
-          left: '8%',
-          width: '290px',
-          height: '290px',
-          transform: 'rotate(-48deg)',
-          opacity: 0.04,
-          backgroundImage: `url(${watermark})`,
-          backgroundSize: 'contain',
-          backgroundRepeat: 'no-repeat',
-          backgroundPosition: 'center'
-        }} />
-
-        {/* Bottom Left */}
-        <Box sx={{
-          position: 'absolute',
-          bottom: '-90px',
-          left: '-90px',
-          width: '370px',
-          height: '370px',
-          transform: 'rotate(-55deg)',
-          opacity: 0.055,
-          backgroundImage: `url(${watermark})`,
-          backgroundSize: 'contain',
-          backgroundRepeat: 'no-repeat',
-          backgroundPosition: 'center'
-        }} />
-
-        {/* Bottom Center Left */}
-        <Box sx={{
-          position: 'absolute',
-          bottom: '80px',
-          left: '30%',
-          width: '320px',
-          height: '320px',
-          transform: 'rotate(-43deg)',
-          opacity: 0.04,
-          backgroundImage: `url(${watermark})`,
-          backgroundSize: 'contain',
-          backgroundRepeat: 'no-repeat',
-          backgroundPosition: 'center'
-        }} />
-
-        {/* Bottom Center */}
-        <Box sx={{
-          position: 'absolute',
-          bottom: '-60px',
-          left: '48%',
-          width: '340px',
-          height: '340px',
-          transform: 'rotate(-35deg)',
-          opacity: 0.06,
-          backgroundImage: `url(${watermark})`,
-          backgroundSize: 'contain',
-          backgroundRepeat: 'no-repeat',
-          backgroundPosition: 'center'
-        }} />
-
-        {/* Bottom Right */}
-        <Box sx={{
-          position: 'absolute',
-          bottom: '-120px',
-          right: '-120px',
-          width: '450px',
-          height: '450px',
-          transform: 'rotate(-45deg)',
-          opacity: 0.05,
-          backgroundImage: `url(${watermark})`,
-          backgroundSize: 'contain',
-          backgroundRepeat: 'no-repeat',
-          backgroundPosition: 'center'
-        }} />
-      </Box>
 
       <Box sx={{ maxWidth: '800px', mx: 'auto', position: 'relative', zIndex: 10 }}>
-        {/* Header */}
+        {/* Header - unchanged */}
         <Box sx={{ textAlign: 'center', mb: 6 }}>
           <Box sx={{ textAlign: 'center', mb: 6 }}>
             <Box
@@ -579,7 +398,6 @@ export default function FacilityIssuesReport() {
                 flexWrap: 'wrap'
               }}
             >
-              {/* Logo */}
               <Box
                 component="img"
                 src={logo}
@@ -590,22 +408,7 @@ export default function FacilityIssuesReport() {
                   objectFit: 'contain'
                 }}
               />
-
-              {/* Company Name */}
-              <Typography
-                variant="h3"
-                sx={{
-                  fontWeight: 800,
-                  color: '#0f172a',
-                  letterSpacing: '-0.02em',
-                  fontSize: { xs: '1.8rem', md: '2.4rem' }
-                }}
-              >
-                Sunray
-              </Typography>
             </Box>
-
-            {/* Page Title */}
             <Typography
               variant="h4"
               sx={{
@@ -617,8 +420,6 @@ export default function FacilityIssuesReport() {
             >
               Facility Report
             </Typography>
-
-            {/* Subtitle */}
             <Typography
               variant="body1"
               sx={{
@@ -633,9 +434,6 @@ export default function FacilityIssuesReport() {
               Maintenance & Facility Issues
             </Typography>
           </Box>
-
-
-          {/* Subtitle */}
           <Typography
             variant="body1"
             sx={{
@@ -650,8 +448,7 @@ export default function FacilityIssuesReport() {
           </Typography>
         </Box>
 
-
-        {/* Main Card - Transparent background to show watermarks */}
+        {/* Main Card */}
         <Paper
           elevation={24}
           sx={{
@@ -661,35 +458,20 @@ export default function FacilityIssuesReport() {
             backdropFilter: 'blur(20px)',
             position: 'relative',
             zIndex: 20,
-            '&::before': {
-              content: '""',
-              position: 'absolute',
-              inset: 0,
-              backgroundImage: `url(${watermark})`,
-              backgroundSize: '300px 300px',
-              backgroundRepeat: 'no-repeat',
-              backgroundPosition: 'bottom right',
-              transform: 'rotate(-45deg)',
-              opacity: 0.03,
-              zIndex: -1
-            }
           }}
         >
-          {/* Header Section */}
+          {/* Header Section - unchanged */}
           <Box sx={{
             p: 4,
             background: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
             position: 'relative',
             overflow: 'hidden'
           }}>
-            <Box sx={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, opacity: 0.1 }}>
-              <Build sx={{ fontSize: 200, position: 'absolute', top: -50, right: -50 }} />
-            </Box>
             <Typography variant="h4" sx={{ color: 'white', fontWeight: 700, mb: 1, position: 'relative', zIndex: 1 }}>
               New Issue Report
             </Typography>
             <Typography variant="body1" sx={{ color: 'rgba(255,255,255,0.9)', position: 'relative', zIndex: 1 }}>
-              All fields marked with * are required
+              Required fields: Location, Issue Type, Description, Urgency
             </Typography>
           </Box>
 
@@ -705,7 +487,7 @@ export default function FacilityIssuesReport() {
             )}
 
             <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-              {/* Row 1: Date/Time & Location */}
+              {/* Row 1: Date/Time & Location Dropdown */}
               <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 3 }}>
                 <Box>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1.5 }}>
@@ -722,7 +504,6 @@ export default function FacilityIssuesReport() {
                     value={formData.dateTime}
                     onChange={handleInputChange}
                     fullWidth
-                    required
                     InputLabelProps={{ shrink: true }}
                     sx={{
                       '& .MuiOutlinedInput-root': {
@@ -745,23 +526,40 @@ export default function FacilityIssuesReport() {
                       Location/Department *
                     </Typography>
                   </Box>
-                  <TextField
-                    name="locationDepartment"
-                    value={formData.locationDepartment}
-                    onChange={handleInputChange}
-                    placeholder="e.g., Building A, Floor 3, Room 305 - Engineering"
-                    fullWidth
-                    required
-                    sx={{
-                      '& .MuiOutlinedInput-root': {
-                        borderRadius: 2.5,
-                        backgroundColor: 'grey.50',
-                        '& fieldset': { borderColor: 'grey.200' },
-                        '&:hover fieldset': { borderColor: 'primary.main' },
-                        '&.Mui-focused fieldset': { borderColor: 'primary.main', borderWidth: 2 }
-                      }
-                    }}
-                  />
+                  <FormControl fullWidth required sx={{ bgcolor: 'grey.50', borderRadius: 2.5 }}>
+                    <InputLabel>Location/Department</InputLabel>
+                    <Select
+                      name="locationDepartment"
+                      value={formData.locationDepartment}
+                      onChange={handleInputChange}
+                      label="Location/Department"
+                    >
+                      {locations.map((location) => (
+                        <MenuItem key={location} value={location} sx={{ py: 1.5 }}>
+                          {location}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+
+                  {/* Other Location Field */}
+                  {formData.locationDepartment === 'Others' && (
+                    <TextField
+                      name="otherLocation"
+                      value={formData.otherLocation}
+                      onChange={handleInputChange}
+                      placeholder="Please specify the location..."
+                      fullWidth
+                      sx={{
+                        mt: 2,
+                        '& .MuiOutlinedInput-root': {
+                          borderRadius: 2.5,
+                          backgroundColor: 'grey.50',
+                          '& fieldset': { borderColor: 'grey.200' }
+                        }
+                      }}
+                    />
+                  )}
                 </Box>
               </Box>
 
@@ -772,17 +570,16 @@ export default function FacilityIssuesReport() {
                     <Description sx={{ fontSize: 20, color: '#2563eb' }} />
                   </Box>
                   <Typography variant="subtitle1" sx={{ fontWeight: 600, color: 'grey.800' }}>
-                    Issue Type
+                    Issue Type *
                   </Typography>
                 </Box>
                 <FormControl fullWidth required sx={{ bgcolor: 'grey.50', borderRadius: 2.5 }}>
-                  <InputLabel>Issue Type </InputLabel>
+                  <InputLabel>Issue Type</InputLabel>
                   <Select
                     name="issueType"
                     value={formData.issueType}
                     onChange={handleInputChange}
                     label="Issue Type"
-                    sx={{ borderRadius: 2.5 }}
                   >
                     {issueTypes.map((type) => (
                       <MenuItem key={type} value={type} sx={{ py: 1.5 }}>
@@ -791,16 +588,35 @@ export default function FacilityIssuesReport() {
                     ))}
                   </Select>
                 </FormControl>
+
+                {/* Other Issue Field */}
+                {formData.issueType === 'Other' && (
+                  <TextField
+                    name="otherIssue"
+                    value={formData.otherIssue}
+                    onChange={handleInputChange}
+                    placeholder="Please specify the issue type..."
+                    fullWidth
+                    sx={{
+                      mt: 2,
+                      '& .MuiOutlinedInput-root': {
+                        borderRadius: 2.5,
+                        backgroundColor: 'grey.50',
+                        '& fieldset': { borderColor: 'grey.200' }
+                      }
+                    }}
+                  />
+                )}
               </Box>
 
-              {/* Description */}
+              {/* Description - Required */}
               <Box>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1.5 }}>
                   <Box sx={{ bgcolor: '#dbeafe', p: 0.5, borderRadius: '50%' }}>
                     <Description sx={{ fontSize: 20, color: '#2563eb' }} />
                   </Box>
                   <Typography variant="subtitle1" sx={{ fontWeight: 600, color: 'grey.800' }}>
-                    Description
+                    Description *
                   </Typography>
                 </Box>
                 <TextField
@@ -824,24 +640,23 @@ export default function FacilityIssuesReport() {
                 />
               </Box>
 
-              {/* Urgency */}
+              {/* Urgency - Required */}
               <Box>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1.5 }}>
                   <Box sx={{ bgcolor: '#dbeafe', p: 0.5, borderRadius: '50%' }}>
                     <PriorityHigh sx={{ fontSize: 20, color: '#2563eb' }} />
                   </Box>
                   <Typography variant="subtitle1" sx={{ fontWeight: 600, color: 'grey.800' }}>
-                    Urgency Level
+                    Urgency Level *
                   </Typography>
                 </Box>
                 <FormControl fullWidth required sx={{ bgcolor: 'grey.50', borderRadius: 2.5 }}>
-                  <InputLabel>Urgency Level </InputLabel>
+                  <InputLabel>Urgency Level</InputLabel>
                   <Select
                     name="urgency"
                     value={formData.urgency}
                     onChange={handleInputChange}
                     label="Urgency Level"
-                    sx={{ borderRadius: 2.5 }}
                   >
                     {urgencyLevels.map((level) => (
                       <MenuItem key={level.value} value={level.value} sx={{ py: 1.5 }}>
@@ -873,6 +688,7 @@ export default function FacilityIssuesReport() {
                   </Typography>
                 </Box>
 
+
                 <input
                   type="file"
                   accept="image/*"
@@ -881,6 +697,7 @@ export default function FacilityIssuesReport() {
                   style={{ display: 'none' }}
                   id="image-upload"
                 />
+
 
                 {!imagePreview ? (
                   <label htmlFor="image-upload">
@@ -952,37 +769,38 @@ export default function FacilityIssuesReport() {
                 )}
               </Paper>
 
-              {/* Contact Section */}
-              <Paper sx={{ p: 4, borderRadius: 3, bgcolor: 'primary.50' }}>
+
+
+              {/* Contact Section - Optional */}
+              <Paper sx={{ p: 4, borderRadius: 3, bgcolor: 'grey.50' }}>
                 <Typography
                   variant="h6"
                   sx={{
                     mb: 3,
                     fontWeight: 700,
-                    color: 'primary.main',
+                    color: 'grey.800',
                     display: 'flex',
                     alignItems: 'center',
                     gap: 1.5
                   }}
                 >
-                  <Person sx={{ fontSize: 28 }} />
-                  Contact Information
+                  <Person sx={{ fontSize: 28, color: '#2563eb' }} />
+                  Contact Information (Optional)
                 </Typography>
 
                 <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 3 }}>
                   <Box>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1.5 }}>
-                      <Box sx={{ bgcolor: 'white', p: 0.5, borderRadius: '50%' }}>
-                        <Person sx={{ fontSize: 20, color: 'primary.main' }} />
+                      <Box sx={{ bgcolor: '#dbeafe', p: 0.5, borderRadius: '50%' }}>
+                        <Person sx={{ fontSize: 20, color: '#2563eb' }} />
                       </Box>
-                      <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>Full Name *</Typography>
+                      <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>Full Name</Typography>
                     </Box>
                     <TextField
                       name="contactName"
                       value={formData.contactName}
                       onChange={handleInputChange}
                       fullWidth
-                      required
                       sx={{
                         '& .MuiOutlinedInput-root': {
                           borderRadius: 2,
@@ -995,10 +813,10 @@ export default function FacilityIssuesReport() {
 
                   <Box>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1.5 }}>
-                      <Box sx={{ bgcolor: 'white', p: 0.5, borderRadius: '50%' }}>
-                        <Email sx={{ fontSize: 20, color: 'primary.main' }} />
+                      <Box sx={{ bgcolor: '#dbeafe', p: 0.5, borderRadius: '50%' }}>
+                        <Email sx={{ fontSize: 20, color: '#2563eb' }} />
                       </Box>
-                      <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>Email *</Typography>
+                      <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>Email</Typography>
                     </Box>
                     <TextField
                       name="contactEmail"
@@ -1006,7 +824,6 @@ export default function FacilityIssuesReport() {
                       value={formData.contactEmail}
                       onChange={handleInputChange}
                       fullWidth
-                      required
                       sx={{
                         '& .MuiOutlinedInput-root': {
                           borderRadius: 2,
@@ -1019,10 +836,10 @@ export default function FacilityIssuesReport() {
 
                   <Box sx={{ gridColumn: { xs: '1 / -1', md: 'auto' } }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1.5 }}>
-                      <Box sx={{ bgcolor: 'white', p: 0.5, borderRadius: '50%' }}>
-                        <ContactPhone sx={{ fontSize: 20, color: 'primary.main' }} />
+                      <Box sx={{ bgcolor: '#dbeafe', p: 0.5, borderRadius: '50%' }}>
+                        <ContactPhone sx={{ fontSize: 20, color: '#2563eb' }} />
                       </Box>
-                      <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>Phone (Optional)</Typography>
+                      <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>Phone</Typography>
                     </Box>
                     <TextField
                       name="contactPhone"
@@ -1042,7 +859,8 @@ export default function FacilityIssuesReport() {
                 </Box>
               </Paper>
 
-              {/* Submit Button */}
+
+              {/* Submit Button - unchanged */}
               <Button
                 type="submit"
                 variant="contained"
@@ -1070,6 +888,8 @@ export default function FacilityIssuesReport() {
               >
                 {loading ? 'Processing Report...' : 'Submit Facility Report'}
               </Button>
+
+              {/* Success Dialog - unchanged */}
               <Dialog
                 open={successDialogOpen}
                 onClose={() => setSuccessDialogOpen(false)}
@@ -1088,7 +908,6 @@ export default function FacilityIssuesReport() {
                   <CheckCircle color="success" fontSize="large" />
                   Report Submitted Successfully
                 </DialogTitle>
-
                 <DialogContent>
                   <Typography sx={{ mt: 1, color: 'grey.700', lineHeight: 1.6 }}>
                     Thank you for submitting the facility report.
@@ -1096,20 +915,7 @@ export default function FacilityIssuesReport() {
                     Our <strong>Sunray Facilities Team</strong> has received your request and
                     will take action as soon as possible.
                   </Typography>
-
-                  <Box
-                    sx={{
-                      mt: 3,
-                      p: 2,
-                      borderRadius: 2,
-                      bgcolor: 'success.50',
-                      border: '1px solid',
-                      borderColor: 'success.200'
-                    }}
-                  >
-                  </Box>
                 </DialogContent>
-
                 <DialogActions sx={{ p: 3 }}>
                   <Button
                     onClick={() => setSuccessDialogOpen(false)}
@@ -1125,7 +931,6 @@ export default function FacilityIssuesReport() {
                   </Button>
                 </DialogActions>
               </Dialog>
-
             </Box>
           </CardContent>
         </Paper>
