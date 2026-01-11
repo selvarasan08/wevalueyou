@@ -335,48 +335,48 @@ export default function FacilityIssuesReport() {
     }}>
       {/* ... (keep all watermark styling unchanged) */}
 
- <Box sx={{
+      <Box sx={{
         position: 'fixed',
         inset: 0,
         zIndex: 0,
         pointerEvents: 'none',
         overflow: 'hidden'
       }}>
-  {Array.from({ length: 14 }).map((_, row) =>
-    Array.from({ length: 14 }).map((_, col) => {
-      const size = 260;
-      const gap = 230;
-      const rotation = -45;
+        {Array.from({ length: 14 }).map((_, row) =>
+          Array.from({ length: 14 }).map((_, col) => {
+            const size = 260;
+            const gap = 230;
+            const rotation = -45;
 
-      // 🚀 EXTENDED GRID ORIGIN (KEY FIX)
-      const r = row - 5;
-      const c = col - 5;
+            // 🚀 EXTENDED GRID ORIGIN (KEY FIX)
+            const r = row - 5;
+            const c = col - 5;
 
-      return (
-        <Box
-          key={`${row}-${col}`}
-          sx={{
-            position: 'absolute',
+            return (
+              <Box
+                key={`${row}-${col}`}
+                sx={{
+                  position: 'absolute',
 
-            // 🔥 DIAGONAL-SAFE POSITIONING
-            left: `${c * gap - r * gap}px`,
-            top: `${r * gap}px`,
+                  // 🔥 DIAGONAL-SAFE POSITIONING
+                  left: `${c * gap - r * gap}px`,
+                  top: `${r * gap}px`,
 
-            width: size,
-            height: size,
-            transform: `rotate(${rotation}deg)`,
-            opacity: 0.09,
+                  width: size,
+                  height: size,
+                  transform: `rotate(${rotation}deg)`,
+                  opacity: 0.09,
 
-            backgroundImage: `url(${watermark})`,
-            backgroundRepeat: 'no-repeat',
-            backgroundSize: 'contain',
-            backgroundPosition: 'center',
-          }}
-        />
-      );
-    })
-  )}
-</Box>
+                  backgroundImage: `url(${watermark})`,
+                  backgroundRepeat: 'no-repeat',
+                  backgroundSize: 'contain',
+                  backgroundPosition: 'center',
+                }}
+              />
+            );
+          })
+        )}
+      </Box>
 
 
 
@@ -409,15 +409,15 @@ export default function FacilityIssuesReport() {
             </Box>
             <Typography
               variant="h4"
-             sx={{
-              fontWeight: 700,
-              background: 'linear-gradient(135deg, #e95950 0%, #232270 100%)',
-              backgroundClip: 'text',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              mt: 1,
-              fontSize: { xs: '1.6rem', md: '2.2rem' }
-            }}
+              sx={{
+                fontWeight: 700,
+                background: 'linear-gradient(135deg, #e95950 0%, #232270 100%)',
+                backgroundClip: 'text',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                mt: 1,
+                fontSize: { xs: '1.6rem', md: '2.2rem' }
+              }}
             >
               Facility Report
             </Typography>
@@ -452,7 +452,7 @@ export default function FacilityIssuesReport() {
         {/* Main Card */}
         <Paper
           elevation={24}
-           sx={{
+          sx={{
             borderRadius: 4,
             overflow: 'hidden',
             background: 'rgba(255, 255, 255, 0.95)',
@@ -463,7 +463,7 @@ export default function FacilityIssuesReport() {
           }}
         >
           {/* Header Section - unchanged */}
-           <Box sx={{
+          <Box sx={{
             p: 4,
             background: 'linear-gradient(135deg, #e95950 0%, #232270 50%, #1a1f3d 100%)',
             position: 'relative',
@@ -645,7 +645,7 @@ export default function FacilityIssuesReport() {
               {/* Urgency - Required */}
               <Box>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1.5 }}>
-                   <Box sx={{ bgcolor: '#e8e5ff', p: 0.5, borderRadius: '50%' }}>
+                  <Box sx={{ bgcolor: '#e8e5ff', p: 0.5, borderRadius: '50%' }}>
                     <PriorityHigh sx={{ fontSize: 20, color: '#505de9' }} />
                   </Box>
                   <Typography variant="subtitle1" sx={{ fontWeight: 600, color: 'grey.800' }}>
@@ -680,14 +680,14 @@ export default function FacilityIssuesReport() {
               </Box>
 
               {/* Image Upload Section */}
- <Paper sx={{ 
-                p: 4, 
-                borderRadius: 3, 
-                border: '2px dashed', 
+              <Paper sx={{
+                p: 4,
+                borderRadius: 3,
+                border: '2px dashed',
                 borderColor: 'rgba(80, 108, 233, 0.3)'
               }}>
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3 }}>
-                 <Box sx={{ bgcolor: '#e7e5ff', p: 0.75, borderRadius: 2 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3 }}>
+                  <Box sx={{ bgcolor: '#e7e5ff', p: 0.75, borderRadius: 2 }}>
                     <CameraAlt sx={{ fontSize: 24, color: '#5250e9' }} />
                   </Box>
                   <Typography variant="h6" sx={{ fontWeight: 600, color: 'grey.800' }}>
@@ -797,6 +797,7 @@ export default function FacilityIssuesReport() {
                       name="contactName"
                       value={formData.contactName}
                       onChange={handleInputChange}
+                      placeholder="Enter your full name"
                       fullWidth
                       sx={{
                         '& .MuiOutlinedInput-root': {
@@ -818,6 +819,7 @@ export default function FacilityIssuesReport() {
                     <TextField
                       name="contactEmail"
                       type="email"
+                      placeholder="Enter your email address"
                       value={formData.contactEmail}
                       onChange={handleInputChange}
                       fullWidth
@@ -880,7 +882,7 @@ export default function FacilityIssuesReport() {
                 startIcon={loading ? <CircularProgress size={24} sx={{ color: 'white' }} /> : <Send sx={{ color: 'white' }} />}
               >
                 {loading ? 'Processing Report...' : 'Submit Facility Report'}
-              </Button> 
+              </Button>
 
               {/* Success Dialog - unchanged */}
               <Dialog
