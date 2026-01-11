@@ -87,10 +87,10 @@ export default function FacilityIssuesReport() {
   ];
 
   const urgencyLevels = [
-    { value: 'Low', color: '#4caf50', icon: '●' },
-    { value: 'Medium', color: '#ff9800', icon: '●●' },
-    { value: 'High', color: '#f44336', icon: '●●●' },
-    { value: 'Emergency', color: '#d32f2f', icon: '🚨' },
+    { value: 'Low', color: '#e95950', icon: '●' },
+    { value: 'Medium', color: '#e95950', icon: '●●' },
+    { value: 'High', color: '#e95950', icon: '●●●' },
+    { value: 'Emergency', color: '#e95950', icon: '🚨' },
   ];
 
   const handleInputChange = (e) => {
@@ -335,15 +335,13 @@ export default function FacilityIssuesReport() {
     }}>
       {/* ... (keep all watermark styling unchanged) */}
 
-<Box
-  sx={{
-    position: 'fixed',
-    inset: 0,
-    zIndex: 0,
-    pointerEvents: 'none',
-    overflow: 'hidden',
-  }}
->
+ <Box sx={{
+        position: 'fixed',
+        inset: 0,
+        zIndex: 0,
+        pointerEvents: 'none',
+        overflow: 'hidden'
+      }}>
   {Array.from({ length: 14 }).map((_, row) =>
     Array.from({ length: 14 }).map((_, col) => {
       const size = 260;
@@ -351,8 +349,8 @@ export default function FacilityIssuesReport() {
       const rotation = -45;
 
       // 🚀 EXTENDED GRID ORIGIN (KEY FIX)
-      const r = row - 6;
-      const c = col - 6;
+      const r = row - 5;
+      const c = col - 5;
 
       return (
         <Box
@@ -411,12 +409,15 @@ export default function FacilityIssuesReport() {
             </Box>
             <Typography
               variant="h4"
-              sx={{
-                fontWeight: 700,
-                color: '#1e293b',
-                mt: 1,
-                fontSize: { xs: '1.6rem', md: '2.2rem' }
-              }}
+             sx={{
+              fontWeight: 700,
+              background: 'linear-gradient(135deg, #e95950 0%, #232270 100%)',
+              backgroundClip: 'text',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              mt: 1,
+              fontSize: { xs: '1.6rem', md: '2.2rem' }
+            }}
             >
               Facility Report
             </Typography>
@@ -451,26 +452,27 @@ export default function FacilityIssuesReport() {
         {/* Main Card */}
         <Paper
           elevation={24}
-          sx={{
+           sx={{
             borderRadius: 4,
             overflow: 'hidden',
-            background: 'rgba(255, 255, 255, 0.92)',
+            background: 'rgba(255, 255, 255, 0.95)',
             backdropFilter: 'blur(20px)',
             position: 'relative',
             zIndex: 20,
+            border: '1px solid rgba(233, 89, 80, 0.1)'
           }}
         >
           {/* Header Section - unchanged */}
-          <Box sx={{
+           <Box sx={{
             p: 4,
-            background: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
+            background: 'linear-gradient(135deg, #e95950 0%, #232270 50%, #1a1f3d 100%)',
             position: 'relative',
             overflow: 'hidden'
           }}>
-            <Typography variant="h4" sx={{ color: 'white', fontWeight: 700, mb: 1, position: 'relative', zIndex: 1 }}>
+            <Typography variant="h4" sx={{ color: 'white', fontWeight: 700, mb: 1 }}>
               New Issue Report
             </Typography>
-            <Typography variant="body1" sx={{ color: 'rgba(255,255,255,0.9)', position: 'relative', zIndex: 1 }}>
+            <Typography variant="body1" sx={{ color: 'rgba(255,255,255,0.9)' }}>
               Required fields: Location, Issue Type, Description, Urgency
             </Typography>
           </Box>
@@ -643,8 +645,8 @@ export default function FacilityIssuesReport() {
               {/* Urgency - Required */}
               <Box>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1.5 }}>
-                  <Box sx={{ bgcolor: '#dbeafe', p: 0.5, borderRadius: '50%' }}>
-                    <PriorityHigh sx={{ fontSize: 20, color: '#2563eb' }} />
+                   <Box sx={{ bgcolor: '#e8e5ff', p: 0.5, borderRadius: '50%' }}>
+                    <PriorityHigh sx={{ fontSize: 20, color: '#505de9' }} />
                   </Box>
                   <Typography variant="subtitle1" sx={{ fontWeight: 600, color: 'grey.800' }}>
                     Urgency Level *
@@ -678,10 +680,15 @@ export default function FacilityIssuesReport() {
               </Box>
 
               {/* Image Upload Section */}
-              <Paper sx={{ p: 4, borderRadius: 3, border: '2px dashed', borderColor: 'grey.300' }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3 }}>
-                  <Box sx={{ bgcolor: '#dbeafe', p: 0.75, borderRadius: 2 }}>
-                    <CameraAlt sx={{ fontSize: 24, color: '#2563eb' }} />
+ <Paper sx={{ 
+                p: 4, 
+                borderRadius: 3, 
+                border: '2px dashed', 
+                borderColor: 'rgba(80, 108, 233, 0.3)'
+              }}>
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3 }}>
+                 <Box sx={{ bgcolor: '#e7e5ff', p: 0.75, borderRadius: 2 }}>
+                    <CameraAlt sx={{ fontSize: 24, color: '#5250e9' }} />
                   </Box>
                   <Typography variant="h6" sx={{ fontWeight: 600, color: 'grey.800' }}>
                     Photo Evidence (Optional)
@@ -772,19 +779,9 @@ export default function FacilityIssuesReport() {
 
 
               {/* Contact Section - Optional */}
-              <Paper sx={{ p: 4, borderRadius: 3, bgcolor: 'grey.50' }}>
-                <Typography
-                  variant="h6"
-                  sx={{
-                    mb: 3,
-                    fontWeight: 700,
-                    color: 'grey.800',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 1.5
-                  }}
-                >
-                  <Person sx={{ fontSize: 28, color: '#2563eb' }} />
+              <Paper sx={{ p: 4, borderRadius: 3, bgcolor: '#f8f9ff' }}>
+                <Typography variant="h6" sx={{ mb: 3, fontWeight: 700, color: '#525252', display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                  <Person sx={{ fontSize: 28, color: '#6750e9' }} />
                   Contact Information (Optional)
                 </Typography>
 
@@ -872,22 +869,18 @@ export default function FacilityIssuesReport() {
                   borderRadius: 3,
                   fontSize: '1.1rem',
                   fontWeight: 700,
-                  background: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
-                  boxShadow: 6,
+                  background: 'linear-gradient(135deg, #e95950 0%, #232270 100%)',
+                  boxShadow: '0 10px 30px rgba(233, 89, 80, 0.4)',
                   '&:hover': {
-                    background: 'linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%)',
+                    background: 'linear-gradient(135deg, #d94a42 0%, #1a1f3d 100%)',
                     transform: 'translateY(-2px)',
-                    boxShadow: 12
-                  },
-                  '&:disabled': {
-                    background: 'grey.400',
-                    transform: 'none'
+                    boxShadow: '0 15px 40px rgba(233, 89, 80, 0.5)'
                   }
                 }}
-                startIcon={loading ? <CircularProgress size={24} color="inherit" /> : <Send />}
+                startIcon={loading ? <CircularProgress size={24} sx={{ color: 'white' }} /> : <Send sx={{ color: 'white' }} />}
               >
                 {loading ? 'Processing Report...' : 'Submit Facility Report'}
-              </Button>
+              </Button> 
 
               {/* Success Dialog - unchanged */}
               <Dialog
