@@ -61,9 +61,9 @@ export default function FacilityIssuesReport() {
   const fileInputRef = useRef(null);
 
   // Configure your EmailJS credentials here
-  const EMAILJS_SERVICE_ID = 'service_7wjoe3t';
-  const EMAILJS_TEMPLATE_ID = 'template_2zf30dq';
-  const EMAILJS_PUBLIC_KEY = 'jleqZ6bYmgFzO3XcC';
+  const EMAILJS_SERVICE_ID = 'service_86b6tiv';
+  const EMAILJS_TEMPLATE_ID = 'template_fq4ph58';
+  const EMAILJS_PUBLIC_KEY = '2sce3923pCPmotTCy';
 
   const locations = [
     'Sunray HQ',
@@ -87,10 +87,10 @@ export default function FacilityIssuesReport() {
   ];
 
   const urgencyLevels = [
-    { value: 'Low', color: '#e95950', icon: '●' },
-    { value: 'Medium', color: '#e95950', icon: '●●' },
-    { value: 'High', color: '#e95950', icon: '●●●' },
-    { value: 'Emergency', color: '#e95950', icon: '🚨' },
+    { value: 'Low', color: '#74e950' },
+    { value: 'Medium', color: '#d2e950' },
+    { value: 'High', color: '#1a0b6d' },
+    { value: 'Emergency', color: '#ec0606' },
   ];
 
   const handleInputChange = (e) => {
