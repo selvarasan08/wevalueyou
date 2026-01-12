@@ -60,6 +60,8 @@ export default function FacilityIssuesReport() {
   const [successDialogOpen, setSuccessDialogOpen] = useState(false);
   const [submitStatus, setSubmitStatus] = useState(null);
   const videoRef = useRef(null); // Added for camera preview
+  const [photoOptionsOpen, setPhotoOptionsOpen] = useState(false);
+
   const streamRef = useRef(null); // Added to manage camera stream
   const fileInputRef = useRef(null);
 
@@ -187,6 +189,55 @@ export default function FacilityIssuesReport() {
       reader.readAsDataURL(file);
     }
   };
+    // SIMPLIFIED: Single unified image handler
+  const handleImageSelected = async (file) => {
+    if (file && file.size > 5000000) {
+      setSubmitStatus({
+        type: 'error',
+        message: 'Image size should be less than 5MB',
+      });
+      return;
+    }
+
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        const compressed = await compressImage(reader.result);
+        setImagePreview(compressed);
+        setSubmitStatus({
+          type: 'info',
+          message: 'Image uploaded and compressed successfully!',
+        });
+        setTimeout(() => setSubmitStatus(null), 2000);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  // NEW: Handle gallery upload
+  const handleGalleryUpload = (e) => {
+    const file = e.target.files[0];
+    handleImageSelected(file);
+    setPhotoOptionsOpen(false);
+  };
+
+  // NEW: Handle camera capture (native camera app)
+  const handleCameraCapture = () => {
+    // This triggers the device's native camera app directly
+    const input = fileInputRef.current;
+    if (input) {
+      input.setAttribute('capture', 'environment'); // Rear camera
+      input.click();
+    }
+    setPhotoOptionsOpen(false);
+  };
+
+  const removeImage = () => {
+    setImagePreview(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
 
   // NEW: Handle file upload from device
   const handleFileUpload = (e) => {
@@ -194,23 +245,7 @@ export default function FacilityIssuesReport() {
     handleImageUpload(file);
   };
 
-  // NEW: Handle camera capture
-  const handleCameraCapture = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-      streamRef.current = stream;
 
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        videoRef.current.play();
-      }
-    } catch (err) {
-      setSubmitStatus({
-        type: 'error',
-        message: 'Camera access denied or not available. Please use file upload instead.',
-      });
-    }
-  };
 
   // NEW: Take photo from camera preview
   const takePhoto = async () => {
@@ -242,14 +277,6 @@ export default function FacilityIssuesReport() {
     }
     if (videoRef.current) {
       videoRef.current.srcObject = null;
-    }
-  };
-
-  const removeImage = () => {
-    setImagePreview(null);
-    cancelCamera(); // Also stop camera if active
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
     }
   };
 
@@ -747,177 +774,177 @@ export default function FacilityIssuesReport() {
               </Box>
 
               {/* Image Upload Section */}
-              <Paper sx={{
-                p: 4,
-                borderRadius: 3,
-                border: '2px dashed',
-                borderColor: 'rgba(80, 108, 233, 0.3)'
-              }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3 }}>
-                  <Box sx={{ bgcolor: '#e7e5ff', p: 0.75, borderRadius: 2 }}>
-                    <CameraAlt sx={{ fontSize: 24, color: '#5250e9' }} />
-                  </Box>
-                  <Typography variant="h6" sx={{ fontWeight: 600, color: 'grey.800' }}>
-                    Photo Evidence (Optional)
-                  </Typography>
-                </Box>
+               <Paper sx={{
+            p: 4,
+            borderRadius: 3,
+            border: '2px dashed',
+            borderColor: 'rgba(80, 108, 233, 0.3)'
+          }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3 }}>
+              <Box sx={{ bgcolor: '#e7e5ff', p: 0.75, borderRadius: 2 }}>
+                <CameraAlt sx={{ fontSize: 24, color: '#5250e9' }} />
+              </Box>
+              <Typography variant="h6" sx={{ fontWeight: 600, color: 'grey.800' }}>
+                Photo Evidence (Optional)
+              </Typography>
+            </Box>
 
-                {!imagePreview ? (
-                  <>
-                    {/* Camera Preview - NEW */}
-                    {videoRef.current && (
-                      <Paper sx={{ mb: 3, p: 3, textAlign: 'center', borderRadius: 3 }}>
-                        <video
-                          ref={videoRef}
-                          style={{
-                            width: '100%',
-                            maxWidth: 400,
-                            height: 300,
-                            objectFit: 'cover',
-                            borderRadius: 16,
-                            display: 'block',
-                            margin: '0 auto 20px'
-                          }}
-                          playsInline
-                        />
-                        <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', flexWrap: 'wrap' }}>
-                          <Button
-                            variant="contained"
-                            onClick={takePhoto}
-                            sx={{
-                              borderRadius: 3,
-                              px: 4,
-                              background: 'linear-gradient(135deg, #16a34a 0%, #15803d 100%)',
-                              '&:hover': { background: 'linear-gradient(135deg, #15803d 0%, #166534 100%)' }
-                            }}
-                            startIcon={<PhotoCamera />}
-                          >
-                            📸 Take Photo
-                          </Button>
-                          <Button
-                            variant="outlined"
-                            onClick={cancelCamera}
-                            sx={{ borderRadius: 3, px: 4 }}
-                          >
-                            Cancel
-                          </Button>
-                        </Box>
-                      </Paper>
-                    )}
+            {imagePreview ? (
+              // ✅ Image Preview (unchanged)
+              <Box sx={{ textAlign: 'center' }}>
+                <Paper
+                  elevation={8}
+                  sx={{
+                    position: 'relative',
+                    display: 'inline-block',
+                    borderRadius: 3,
+                    overflow: 'hidden',
+                    maxWidth: 300,
+                    mx: 'auto'
+                  }}
+                >
+                  <Box
+                    component="img"
+                    src={imagePreview}
+                    alt="Preview"
+                    sx={{
+                      width: '100%',
+                      height: 240,
+                      objectFit: 'cover'
+                    }}
+                  />
+                  <IconButton
+                    onClick={removeImage}
+                    sx={{
+                      position: 'absolute',
+                      top: 8,
+                      right: 8,
+                      bgcolor: 'error.main',
+                      color: 'white',
+                      '&:hover': { bgcolor: 'error.dark' },
+                      minWidth: 40,
+                      height: 40
+                    }}
+                  >
+                    <Close />
+                  </IconButton>
+                </Paper>
+                <Typography variant="body2" sx={{ mt: 2, color: 'success.main', fontWeight: 500 }}>
+                  ✓ Image compressed and ready (under 50KB)
+                </Typography>
+              </Box>
+            ) : (
+              // ✅ NEW: Single "Add Photo" button that opens options
+              <Box sx={{ textAlign: 'center' }}>
+                <input
+                  type="file"
+                  accept="image/*"
+                  ref={fileInputRef}
+                  style={{ display: 'none' }}
+                  id="image-upload"
+                  onChange={handleGalleryUpload}
+                />
 
-                    {/* Upload/Take Photo Buttons */}
-                    <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', flexWrap: 'wrap' }}>
-                      {hasCamera() && (
-                        <Button
-                          variant="contained"
-                          onClick={handleCameraCapture}
-                          sx={{
-                            borderRadius: 3,
-                            px: 4,
-                            py: 1.5,
-                            fontSize: '1rem',
-                            fontWeight: 600,
-                            background: 'linear-gradient(135deg, #e95950 0%, #232270 100%)',
-                            flex: 1,
-                            maxWidth: 200,
-                            '&:hover': {
-                              background: 'linear-gradient(135deg, #d94a42 0%, #1a1f3d 100%)'
-                            }
-                          }}
-                          startIcon={<PhotoCamera />}
-                        >
-                          📷 Take Photo
-                        </Button>
-                      )}
+                <Button
+                  variant="contained"
+                  component="label"
+                  onClick={() => setPhotoOptionsOpen(true)} // Opens modal instead
+                  sx={{
+                    borderRadius: 3,
+                    px: 6,
+                    py: 2.5,
+                    fontSize: '1.1rem',
+                    fontWeight: 600,
+                    background: 'linear-gradient(135deg, #e95950 0%, #232270 100%)',
+                    boxShadow: '0 8px 25px rgba(233, 89, 80, 0.3)',
+                    height: 56,
+                    minWidth: 200,
+                    '&:hover': {
+                      background: 'linear-gradient(135deg, #d94a42 0%, #1a1f3d 100%)',
+                      transform: 'translateY(-2px)',
+                      boxShadow: '0 12px 35px rgba(233, 89, 80, 0.4)'
+                    }
+                  }}
+                  startIcon={<CameraAlt />}
+                >
+                  📷 Add Photo
+                </Button>
 
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleFileUpload}
-                        ref={fileInputRef}
-                        style={{ display: 'none' }}
-                        id="image-upload"
-                        capture="environment" // Prefer rear camera for file input too
-                      />
+                <Typography variant="body2" sx={{ mt: 2, color: 'text.secondary' }}>
+                  Tap to take photo or upload from gallery
+                </Typography>
+              </Box>
+            )}
+          </Paper>
 
-                      <label htmlFor="image-upload">
-                        <Button
-                          variant="outlined"
-                          component="span"
-                          startIcon={<CloudUpload />}
-                          sx={{
-                            borderRadius: 3,
-                            borderWidth: 2,
-                            px: 4,
-                            py: 1.5,
-                            fontSize: '1rem',
-                            fontWeight: 600,
-                            borderColor: 'primary.main',
-                            color: 'primary.main',
-                            flex: 1,
-                            maxWidth: 200,
-                            '&:hover': {
-                              borderWidth: 2,
-                              bgcolor: 'primary.50'
-                            }
-                          }}
-                        >
-                          📁 Upload Photo
-                        </Button>
-                      </label>
+          {/* ✅ NEW: Photo Options Modal */}
+          <Dialog
+            open={photoOptionsOpen}
+            onClose={() => setPhotoOptionsOpen(false)}
+            maxWidth="xs"
+            fullWidth
+          >
+            <DialogTitle sx={{ pb: 1 }}>
+              <Typography variant="h6" sx={{ fontWeight: 700, color: 'grey.800' }}>
+                Choose Photo Source
+              </Typography>
+            </DialogTitle>
+            <DialogContent sx={{ pt: 1 }}>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, py: 1 }}>
+                {/* Camera Option */}
+                <Button
+                  fullWidth
+                  variant="contained"
+                  onClick={handleCameraCapture}
+                  sx={{
+                    borderRadius: 3,
+                    py: 2.5,
+                    fontSize: '1rem',
+                    fontWeight: 600,
+                    background: 'linear-gradient(135deg, #16a34a 0%, #15803d 100%)',
+                    height: 64,
+                    boxShadow: '0 4px 20px rgba(22, 163, 74, 0.3)',
+                    '&:hover': {
+                      background: 'linear-gradient(135deg, #15803d 0%, #166534 100%)',
+                      transform: 'translateY(-1px)'
+                    }
+                  }}
+                  startIcon={<PhotoCamera />}
+                >
+                  📸 Take Photo
+                </Button>
+
+                {/* Gallery Option */}
+                <label htmlFor="image-upload">
+                  <Button
+                    fullWidth
+                    variant="outlined"
+                    component="span"
+                    sx={{
+                      borderRadius: 3,
+                      py: 2.5,
+                      fontSize: '1rem',
+                      fontWeight: 600,
+                      borderWidth: 2,
+                      borderColor: 'primary.main',
+                      color: 'primary.main',
+                      height: 64,
+                      '&:hover': {
+                        borderWidth: 2,
+                        bgcolor: 'primary.50',
+                        borderColor: 'primary.dark'
+                      }
+                    }}
+                  >
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                      <CloudUpload />
+                      Upload from Gallery
                     </Box>
-
-                    {!hasCamera() && (
-                      <Typography variant="body2" sx={{ mt: 2, color: 'text.secondary', textAlign: 'center' }}>
-                        Camera not available. Please use file upload.
-                      </Typography>
-                    )}
-                  </>
-                ) : (
-                  <Box sx={{ textAlign: 'center' }}>
-                    <Paper
-                      elevation={8}
-                      sx={{
-                        position: 'relative',
-                        display: 'inline-block',
-                        borderRadius: 3,
-                        overflow: 'hidden',
-                        maxWidth: 300,
-                        mx: 'auto'
-                      }}
-                    >
-                      <Box
-                        component="img"
-                        src={imagePreview}
-                        alt="Preview"
-                        sx={{
-                          width: '100%',
-                          height: 240,
-                          objectFit: 'cover'
-                        }}
-                      />
-                      <IconButton
-                        onClick={removeImage}
-                        sx={{
-                          position: 'absolute',
-                          top: 8,
-                          right: 8,
-                          bgcolor: 'error.main',
-                          color: 'white',
-                          '&:hover': { bgcolor: 'error.dark' },
-                          minWidth: 40,
-                          height: 40
-                        }}
-                      >
-                        <Close />
-                      </IconButton>
-                    </Paper>
-                    <Typography variant="body2" sx={{ mt: 2, color: 'success.main', fontWeight: 500 }}>
-                      ✓ Image compressed and ready (under 50KB)
-                    </Typography>
-                  </Box>
-                )}
-              </Paper>
+                  </Button>
+                </label>
+              </Box>
+            </DialogContent>
+          </Dialog>
 
 
 
