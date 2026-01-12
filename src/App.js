@@ -34,6 +34,7 @@ import {
   ContactPhone,
   Email,
   Person,
+  PhotoCamera, // Added for camera button
   CameraAlt,
 } from '@mui/icons-material';
 import watermark from './waterMark-removebg-preview.png';
@@ -58,6 +59,8 @@ export default function FacilityIssuesReport() {
   const [loading, setLoading] = useState(false);
   const [successDialogOpen, setSuccessDialogOpen] = useState(false);
   const [submitStatus, setSubmitStatus] = useState(null);
+  const videoRef = useRef(null); // Added for camera preview
+  const streamRef = useRef(null); // Added to manage camera stream
   const fileInputRef = useRef(null);
 
   // Configure your EmailJS credentials here
@@ -155,8 +158,7 @@ export default function FacilityIssuesReport() {
     });
   };
 
-  const handleImageUpload = async (e) => {
-    const file = e.target.files[0];
+  const handleImageUpload = async (file) => {
     if (file) {
       if (file.size > 5000000) {
         setSubmitStatus({
@@ -186,12 +188,72 @@ export default function FacilityIssuesReport() {
     }
   };
 
+  // NEW: Handle file upload from device
+  const handleFileUpload = (e) => {
+    const file = e.target.files[0];
+    handleImageUpload(file);
+  };
+
+  // NEW: Handle camera capture
+  const handleCameraCapture = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+      streamRef.current = stream;
+
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        videoRef.current.play();
+      }
+    } catch (err) {
+      setSubmitStatus({
+        type: 'error',
+        message: 'Camera access denied or not available. Please use file upload instead.',
+      });
+    }
+  };
+
+  // NEW: Take photo from camera preview
+  const takePhoto = async () => {
+    if (videoRef.current && streamRef.current) {
+      const video = videoRef.current;
+      const canvas = document.createElement('canvas');
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(video, 0, 0);
+
+      // Stop camera stream
+      streamRef.current.getTracks().forEach(track => track.stop());
+      video.srcObject = null;
+
+      // Convert to file and process
+      canvas.toBlob((blob) => {
+        const file = new File([blob], 'captured-photo.jpg', { type: 'image/jpeg' });
+        handleImageUpload(file);
+      }, 'image/jpeg', 0.8);
+    }
+  };
+
+  // NEW: Cancel camera preview
+  const cancelCamera = () => {
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(track => track.stop());
+      streamRef.current = null;
+    }
+    if (videoRef.current) {
+      videoRef.current.srcObject = null;
+    }
+  };
+
   const removeImage = () => {
     setImagePreview(null);
+    cancelCamera(); // Also stop camera if active
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
   };
+
+
 
   const validateForm = () => {
     const required = ['description', 'urgency'];
@@ -322,6 +384,11 @@ export default function FacilityIssuesReport() {
         }}
       />
     ) : null;
+  };
+
+  // Check if camera is available
+  const hasCamera = () => {
+    return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
   };
 
   return (
@@ -695,41 +762,117 @@ export default function FacilityIssuesReport() {
                   </Typography>
                 </Box>
 
-
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageUpload}
-                  ref={fileInputRef}
-                  style={{ display: 'none' }}
-                  id="image-upload"
-                />
-
-
                 {!imagePreview ? (
-                  <label htmlFor="image-upload">
-                    <Button
-                      variant="outlined"
-                      component="span"
-                      startIcon={<CloudUpload />}
-                      sx={{
-                        borderRadius: 3,
-                        borderWidth: 2,
-                        px: 4,
-                        py: 1.5,
-                        fontSize: '1rem',
-                        fontWeight: 600,
-                        borderColor: 'primary.main',
-                        color: 'primary.main',
-                        '&:hover': {
-                          borderWidth: 2,
-                          bgcolor: 'primary.50'
-                        }
-                      }}
-                    >
-                      📷 Upload Photo
-                    </Button>
-                  </label>
+                  <>
+                    {/* Camera Preview - NEW */}
+                    {videoRef.current && (
+                      <Paper sx={{ mb: 3, p: 3, textAlign: 'center', borderRadius: 3 }}>
+                        <video
+                          ref={videoRef}
+                          style={{
+                            width: '100%',
+                            maxWidth: 400,
+                            height: 300,
+                            objectFit: 'cover',
+                            borderRadius: 16,
+                            display: 'block',
+                            margin: '0 auto 20px'
+                          }}
+                          playsInline
+                        />
+                        <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', flexWrap: 'wrap' }}>
+                          <Button
+                            variant="contained"
+                            onClick={takePhoto}
+                            sx={{
+                              borderRadius: 3,
+                              px: 4,
+                              background: 'linear-gradient(135deg, #16a34a 0%, #15803d 100%)',
+                              '&:hover': { background: 'linear-gradient(135deg, #15803d 0%, #166534 100%)' }
+                            }}
+                            startIcon={<PhotoCamera />}
+                          >
+                            📸 Take Photo
+                          </Button>
+                          <Button
+                            variant="outlined"
+                            onClick={cancelCamera}
+                            sx={{ borderRadius: 3, px: 4 }}
+                          >
+                            Cancel
+                          </Button>
+                        </Box>
+                      </Paper>
+                    )}
+
+                    {/* Upload/Take Photo Buttons */}
+                    <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', flexWrap: 'wrap' }}>
+                      {hasCamera() && (
+                        <Button
+                          variant="contained"
+                          onClick={handleCameraCapture}
+                          sx={{
+                            borderRadius: 3,
+                            px: 4,
+                            py: 1.5,
+                            fontSize: '1rem',
+                            fontWeight: 600,
+                            background: 'linear-gradient(135deg, #e95950 0%, #232270 100%)',
+                            flex: 1,
+                            maxWidth: 200,
+                            '&:hover': {
+                              background: 'linear-gradient(135deg, #d94a42 0%, #1a1f3d 100%)'
+                            }
+                          }}
+                          startIcon={<PhotoCamera />}
+                        >
+                          📷 Take Photo
+                        </Button>
+                      )}
+
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleFileUpload}
+                        ref={fileInputRef}
+                        style={{ display: 'none' }}
+                        id="image-upload"
+                        capture="environment" // Prefer rear camera for file input too
+                      />
+
+                      <label htmlFor="image-upload">
+                        <Button
+                          variant="outlined"
+                          component="span"
+                          startIcon={<CloudUpload />}
+                          sx={{
+                            borderRadius: 3,
+                            borderWidth: 2,
+                            px: 4,
+                            py: 1.5,
+                            fontSize: '1rem',
+                            fontWeight: 600,
+                            borderColor: 'primary.main',
+                            color: 'primary.main',
+                            flex: 1,
+                            maxWidth: 200,
+                            '&:hover': {
+                              borderWidth: 2,
+                              bgcolor: 'primary.50'
+                            }
+                          }}
+                        >
+                          📁 Upload Photo
+                        </Button>
+                      </label>
+                    </Box>
+
+                    {!hasCamera() && (
+                      <Typography variant="body2" sx={{ mt: 2, color: 'text.secondary', textAlign: 'center' }}>
+                        Camera not available. Please use file upload.
+                      </Typography>
+                    )}
+                  </>
                 ) : (
                   <Box sx={{ textAlign: 'center' }}>
                     <Paper
