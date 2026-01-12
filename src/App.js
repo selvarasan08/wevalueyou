@@ -670,7 +670,7 @@ export default function FacilityIssuesReport() {
                     <Description sx={{ fontSize: 20, color: '#2563eb' }} />
                   </Box>
                   <Typography variant="subtitle1" sx={{ fontWeight: 600, color: 'grey.800' }}>
-                    Description *
+                    Request / Feedback Description *
                   </Typography>
                 </Box>
                 <TextField
