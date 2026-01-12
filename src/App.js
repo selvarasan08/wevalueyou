@@ -79,15 +79,14 @@ export default function FacilityIssuesReport() {
   ];
 
   const issueTypes = [
+    'Aircon',
     'Plumbing',
     'Electrical',
-    'HVAC',
-    'Furniture',
-    'Safety',
-    'Cleaning',
-    'Security',
-    'IT Equipment',
-    'Structural',
+    'Fire',
+    'Lift',
+    'Housekeeping ',
+    'Building',
+    'Pests',
     'Other',
   ];
 
