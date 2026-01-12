@@ -13,7 +13,6 @@ import {
   IconButton,
   Box,
   Paper,
-  Chip,
 } from '@mui/material';
 import {
   Dialog,
@@ -30,7 +29,6 @@ import {
   Warning,
   LocationOn,
   Description,
-  PriorityHigh,
   ContactPhone,
   Email,
   Person,
@@ -90,12 +88,6 @@ export default function FacilityIssuesReport() {
     'Other',
   ];
 
-  const urgencyLevels = [
-    { value: 'Low', color: '#74e950' },
-    { value: 'Medium', color: '#d2e950' },
-    { value: 'High', color: '#1a0b6d' },
-    { value: 'Emergency', color: '#ec0606' },
-  ];
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -319,7 +311,6 @@ export default function FacilityIssuesReport() {
         location_department: formData.locationDepartment === 'Others' ? formData.otherLocation : formData.locationDepartment,
         issue_type: formData.issueType === 'Other' ? formData.otherIssue : formData.issueType,
         description: formData.description,
-        urgency: formData.urgency,
         contact_name: formData.contactName || 'N/A',
         contact_email: formData.contactEmail || 'N/A',
         contact_phone: formData.contactPhone || 'N/A',
@@ -364,7 +355,6 @@ export default function FacilityIssuesReport() {
             issueType: '',
             otherIssue: '',
             description: '',
-            urgency: '',
             contactName: '',
             contactEmail: '',
             contactPhone: '',
@@ -396,21 +386,7 @@ export default function FacilityIssuesReport() {
     }
   };
 
-  const getUrgencyChip = (urgency) => {
-    const level = urgencyLevels.find(l => l.value === urgency);
-    return level ? (
-      <Chip
-        label={urgency}
-        size="small"
-        sx={{
-          backgroundColor: level.color + '20',
-          color: level.color,
-          fontWeight: 600,
-          height: 32
-        }}
-      />
-    ) : null;
-  };
+ 
 
   // Check if camera is available
   const hasCamera = () => {
@@ -471,10 +447,6 @@ export default function FacilityIssuesReport() {
         )}
       </Box>
 
-
-
-
-
       <Box sx={{ maxWidth: '800px', mx: 'auto', position: 'relative', zIndex: 10 }}>
         {/* Header - unchanged */}
         <Box sx={{ textAlign: 'center', mb: 6 }}>
@@ -512,7 +484,7 @@ export default function FacilityIssuesReport() {
                 fontSize: { xs: '1.6rem', md: '2.2rem' }
               }}
             >
-              Facility Report
+              Facility Feedback Form 
             </Typography>
             <Typography
               variant="body1"
@@ -528,18 +500,6 @@ export default function FacilityIssuesReport() {
               Maintenance & Facility Issues
             </Typography>
           </Box>
-          <Typography
-            variant="body1"
-            sx={{
-              color: '#475569',
-              maxWidth: 520,
-              mx: 'auto',
-              lineHeight: 1.7,
-              fontSize: '1.05rem'
-            }}
-          >
-            Submit detailed reports for prompt resolution by our facilities team
-          </Typography>
         </Box>
 
         {/* Main Card */}
@@ -563,7 +523,7 @@ export default function FacilityIssuesReport() {
             overflow: 'hidden'
           }}>
             <Typography variant="h4" sx={{ color: 'white', fontWeight: 700, mb: 1 }}>
-              New Issue Report
+              Feedback Form
             </Typography>
             <Typography variant="body1" sx={{ color: 'rgba(255,255,255,0.9)' }}>
               Required fields: Location, Issue Type, Description, Urgency
@@ -735,42 +695,7 @@ export default function FacilityIssuesReport() {
                 />
               </Box>
 
-              {/* Urgency - Required */}
-              <Box>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1.5 }}>
-                  <Box sx={{ bgcolor: '#e8e5ff', p: 0.5, borderRadius: '50%' }}>
-                    <PriorityHigh sx={{ fontSize: 20, color: '#505de9' }} />
-                  </Box>
-                  <Typography variant="subtitle1" sx={{ fontWeight: 600, color: 'grey.800' }}>
-                    Urgency Level *
-                  </Typography>
-                </Box>
-                <FormControl fullWidth required sx={{ bgcolor: 'grey.50', borderRadius: 2.5 }}>
-                  <InputLabel>Urgency Level</InputLabel>
-                  <Select
-                    name="urgency"
-                    value={formData.urgency}
-                    onChange={handleInputChange}
-                    label="Urgency Level"
-                  >
-                    {urgencyLevels.map((level) => (
-                      <MenuItem key={level.value} value={level.value} sx={{ py: 1.5 }}>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                          <Box sx={{ color: level.color, fontSize: '1.2em' }}>
-                            {level.icon}
-                          </Box>
-                          <Typography sx={{ fontWeight: 500 }}>{level.value}</Typography>
-                        </Box>
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-                {formData.urgency && (
-                  <Box sx={{ mt: 1.5 }}>
-                    {getUrgencyChip(formData.urgency)}
-                  </Box>
-                )}
-              </Box>
+            
 
               {/* Image Upload Section */}
               <Paper sx={{
@@ -1050,7 +975,7 @@ export default function FacilityIssuesReport() {
                 }}
                 startIcon={loading ? <CircularProgress size={24} sx={{ color: 'white' }} /> : <Send sx={{ color: 'white' }} />}
               >
-                {loading ? 'Processing Report...' : 'Submit Facility Report'}
+                {loading ? 'Processing Report...' : 'Submit '}
               </Button>
 
               {/* Success Dialog - unchanged */}
@@ -1070,11 +995,11 @@ export default function FacilityIssuesReport() {
                   }}
                 >
                   <CheckCircle color="success" fontSize="large" />
-                  Report Submitted Successfully
+                  Feedback Submitted Successfully
                 </DialogTitle>
                 <DialogContent>
                   <Typography sx={{ mt: 1, color: 'grey.700', lineHeight: 1.6 }}>
-                    Thank you for submitting the facility report.
+                    Thank you for submitting the facility feedback.
                     <br /><br />
                     Our <strong>Sunray Facilities Team</strong> has received your request and
                     will take action as soon as possible.
