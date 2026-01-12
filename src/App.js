@@ -47,7 +47,6 @@ export default function FacilityIssuesReport() {
     issueType: '',
     otherIssue: '',
     description: '',
-    urgency: '',
     contactName: '',
     contactEmail: '',
     contactPhone: '',
@@ -274,7 +273,7 @@ export default function FacilityIssuesReport() {
 
 
   const validateForm = () => {
-    const required = ['description', 'urgency'];
+    const required = ['description'];
     for (let field of required) {
       if (!formData[field]) {
         return false;
@@ -297,7 +296,7 @@ export default function FacilityIssuesReport() {
     if (!validateForm()) {
       setSubmitStatus({
         type: 'error',
-        message: 'Please fill in all required fields (Description, Urgency, Location, Issue Type)',
+        message: 'Please fill in all required fields (Description, Location, Issue Type)',
       });
       return;
     }
@@ -526,7 +525,7 @@ export default function FacilityIssuesReport() {
               Feedback Form
             </Typography>
             <Typography variant="body1" sx={{ color: 'rgba(255,255,255,0.9)' }}>
-              Required fields: Location, Issue Type, Description, Urgency
+              Required fields: Location, Issue Type, Description
             </Typography>
           </Box>
 
