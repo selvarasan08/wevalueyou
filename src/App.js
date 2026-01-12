@@ -273,7 +273,7 @@ export default function FacilityIssuesReport() {
 
 
   const validateForm = () => {
-    const required = ['description'];
+    const required = ['description','contactName', 'contactEmail', 'contactPhone'];
     for (let field of required) {
       if (!formData[field]) {
         return false;
@@ -296,7 +296,7 @@ export default function FacilityIssuesReport() {
     if (!validateForm()) {
       setSubmitStatus({
         type: 'error',
-        message: 'Please fill in all required fields (Description, Location, Issue Type)',
+        message: 'Please fill in all required fields (Description, Location, Issue Type, Contact)',
       });
       return;
     }
@@ -385,7 +385,7 @@ export default function FacilityIssuesReport() {
     }
   };
 
- 
+
 
   // Check if camera is available
   const hasCamera = () => {
@@ -483,7 +483,7 @@ export default function FacilityIssuesReport() {
                 fontSize: { xs: '1.6rem', md: '2.2rem' }
               }}
             >
-              Facility Feedback Form 
+              Facility Feedback Form
             </Typography>
             <Typography
               variant="body1"
@@ -525,7 +525,7 @@ export default function FacilityIssuesReport() {
               Feedback Form
             </Typography>
             <Typography variant="body1" sx={{ color: 'rgba(255,255,255,0.9)' }}>
-              Required fields: Location, Issue Type, Description
+              Required fields: Location, Issue Type, Description , Contact 
             </Typography>
           </Box>
 
@@ -694,7 +694,7 @@ export default function FacilityIssuesReport() {
                 />
               </Box>
 
-            
+
 
               {/* Image Upload Section */}
               <Paper sx={{
@@ -790,7 +790,7 @@ export default function FacilityIssuesReport() {
                       }}
                       startIcon={<CameraAlt />}
                     >
-                     Add Photo
+                      Add Photo
                     </Button>
 
                     <Typography variant="body2" sx={{ mt: 2, color: 'text.secondary' }}>
@@ -834,7 +834,7 @@ export default function FacilityIssuesReport() {
                       }}
                       startIcon={<PhotoCamera />}
                     >
-                       Take Photo
+                      Take Photo
                     </Button>
 
                     {/* Gallery Option */}
@@ -871,11 +871,11 @@ export default function FacilityIssuesReport() {
 
 
 
-              {/* Contact Section - Optional */}
+              {/* Contact Section */}
               <Paper sx={{ p: 4, borderRadius: 3, bgcolor: '#f8f9ff' }}>
                 <Typography variant="h6" sx={{ mb: 3, fontWeight: 700, color: '#525252', display: 'flex', alignItems: 'center', gap: 1.5 }}>
                   <Person sx={{ fontSize: 28, color: '#6750e9' }} />
-                  Contact Information (Optional)
+                  Contact Information <span style={{ color: '#e95950' }}>*</span>
                 </Typography>
 
                 <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 3 }}>
@@ -884,7 +884,9 @@ export default function FacilityIssuesReport() {
                       <Box sx={{ bgcolor: '#dbeafe', p: 0.5, borderRadius: '50%' }}>
                         <Person sx={{ fontSize: 20, color: '#2563eb' }} />
                       </Box>
-                      <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>Full Name</Typography>
+                      <Typography variant="subtitle2" sx={{ fontWeight: 600, color: 'grey.800' }}>
+                        Full Name *
+                      </Typography>
                     </Box>
                     <TextField
                       name="contactName"
@@ -892,11 +894,18 @@ export default function FacilityIssuesReport() {
                       onChange={handleInputChange}
                       placeholder="Enter your full name"
                       fullWidth
+                      required
                       sx={{
                         '& .MuiOutlinedInput-root': {
                           borderRadius: 2,
                           bgcolor: 'white',
-                          '& fieldset': { borderColor: 'grey.200' }
+                          '& fieldset': { borderColor: 'grey.200' },
+                          '&.Mui-focused fieldset': { borderColor: '#e95950', borderWidth: 2 },
+                          '&:hover fieldset': { borderColor: '#e95950' }
+                        },
+                        '& .MuiFormHelperText-root': {
+                          color: '#e95950',
+                          fontWeight: 500
                         }
                       }}
                     />
@@ -907,7 +916,9 @@ export default function FacilityIssuesReport() {
                       <Box sx={{ bgcolor: '#dbeafe', p: 0.5, borderRadius: '50%' }}>
                         <Email sx={{ fontSize: 20, color: '#2563eb' }} />
                       </Box>
-                      <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>Email</Typography>
+                      <Typography variant="subtitle2" sx={{ fontWeight: 600, color: 'grey.800' }}>
+                        Email *
+                      </Typography>
                     </Box>
                     <TextField
                       name="contactEmail"
@@ -916,11 +927,14 @@ export default function FacilityIssuesReport() {
                       value={formData.contactEmail}
                       onChange={handleInputChange}
                       fullWidth
+                      required
                       sx={{
                         '& .MuiOutlinedInput-root': {
                           borderRadius: 2,
                           bgcolor: 'white',
-                          '& fieldset': { borderColor: 'grey.200' }
+                          '& fieldset': { borderColor: 'grey.200' },
+                          '&.Mui-focused fieldset': { borderColor: '#e95950', borderWidth: 2 },
+                          '&:hover fieldset': { borderColor: '#e95950' }
                         }
                       }}
                     />
@@ -931,25 +945,31 @@ export default function FacilityIssuesReport() {
                       <Box sx={{ bgcolor: '#dbeafe', p: 0.5, borderRadius: '50%' }}>
                         <ContactPhone sx={{ fontSize: 20, color: '#2563eb' }} />
                       </Box>
-                      <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>Phone</Typography>
+                      <Typography variant="subtitle2" sx={{ fontWeight: 600, color: 'grey.800' }}>
+                        Phone Number *
+                      </Typography>
                     </Box>
                     <TextField
                       name="contactPhone"
                       value={formData.contactPhone}
                       onChange={handleInputChange}
-                      placeholder="Enter phone number for faster response"
+                      placeholder="Enter phone number (e.g., +65 1234 5678)"
                       fullWidth
+                      required
                       sx={{
                         '& .MuiOutlinedInput-root': {
                           borderRadius: 2,
                           bgcolor: 'white',
-                          '& fieldset': { borderColor: 'grey.200' }
+                          '& fieldset': { borderColor: 'grey.200' },
+                          '&.Mui-focused fieldset': { borderColor: '#e95950', borderWidth: 2 },
+                          '&:hover fieldset': { borderColor: '#e95950' }
                         }
                       }}
                     />
                   </Box>
                 </Box>
               </Paper>
+
 
 
               {/* Submit Button - unchanged */}
